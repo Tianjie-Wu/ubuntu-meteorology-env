@@ -12,14 +12,20 @@ RUN apt-get update \
 WORKDIR /tmp/
 
 RUN wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.23/src/hdf5-1.8.23.tar.bz2 
+RUN wget https://codeload.github.com/Unidata/netcdf-c/tar.gz/refs/tags/v4.8.1
 
 RUN tar -xvf hdf5-1.8.23.tar.bz2 
+RUN tar -xvf v4.8.1
 
 WORKDIR /tmp/hdf5-1.8.23
 
 RUN ./configure --prefix=/usr/local --enable-fortran
 RUN make -j 4
 RUN make install
+
+WORKDIR /tmp/netcdf-c-4.8.1
+
+RUN CC=gcc FC=gfortran LDFLAGS=-L/usr/local/lib CPPFLAGS=-I/usr/local/include ./configure --prefix=/usr/local
 
 ### final
 FROM docker.io/ubuntu:20.04 as ubuntu-meteorology-env
