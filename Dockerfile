@@ -26,6 +26,9 @@ RUN make install
 WORKDIR /tmp/netcdf-c-4.8.1
 
 RUN CC=gcc FC=gfortran LDFLAGS=-L/usr/local/lib CPPFLAGS=-I/usr/local/include ./configure --prefix=/usr/local
+RUN make -j 4 
+RUN make install
+
 
 ### final
 FROM docker.io/ubuntu:20.04 as ubuntu-meteorology-env
