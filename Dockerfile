@@ -43,5 +43,5 @@ RUN apt-get update \
  && apt-get install -y openmpi-* g++ make
 
 COPY --from=builder /usr/local/ /usr/local/
-CMD ['/bin/bash']
+CMD ["/bin/bash"]
 
