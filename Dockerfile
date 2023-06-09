@@ -88,6 +88,6 @@ FROM builder as ubuntu-meteorology-env
 MAINTAINER Tianjie Wu "wutj@cma.gov.cn" 
 
 COPY ./alias.sh /root/.bash_aliases
-COPY --from=lapack-builder /usr/local/ /usr/local/
+COPY --from=grib_api-builder /usr/local/ /usr/local/
 CMD ["/bin/bash"]
 
