@@ -30,3 +30,15 @@ export LD_RUN_PATH=$LD_RUN_PATH:$LOCALIB/lib
 export LD_INCLUDE_PATH=$LD_INCLUDE_PATH:$LOCALIB/include
 export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$LOCALIB/lib/pkgconfig
 
+export NETCDF=/usr/local
+export NETCDF_LIB=$NETCDF/lib
+export NETCDF_INC=$NETCDF/include
+export HDF5=/usr/local
+export NETCDF=/usr/local
+export NETCDF_Fortran_LIBRARY=/usr/local/lib
+export NETCDF_PATH=/usr/local
+export WRFIO_NCD_LARGE_FILE_SUPPORT=1
+export PIO=/usr/local
+export JASPERLIB=/usr/local/lib
+export JASPERINC=/usr/local/include
+
