@@ -96,6 +96,8 @@ RUN tar -xvf lapack-3.8.0.tar.gz
 
 WORKDIR /tmp/lapack-3.8.0
 RUN cp ./INSTALL/make.inc.gfortran ./make.inc
+RUN sed -i 's#./lapack_testing.py##' Makefile
+RUN sed -i 's/CFLAGS = -O3/CFLAGS = -O3 -I$(TOPDIR)/INCLUDE -fno-stack-protector' make.inc
 RUN CC=gcc FC=gfortran LDFLAGS=-L/usr/local/lib CPPFLAGS=-I/usr/local/include make -j `nproc`
 RUN cp lib* /usr/local/lib/
 
