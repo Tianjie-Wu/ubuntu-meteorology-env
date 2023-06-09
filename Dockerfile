@@ -70,7 +70,7 @@ WORKDIR /tmp/grib_api-1.27.0-Source
 
 RUN mkdir build
 WORKDIR build
-RUN cmake ../ -DCMAKE_INSTALL_PREFIX=/usr/local
+RUN CC=gcc FC=gfortran LDFLAGS=-L/usr/local/lib CPPFLAGS=-I/usr/local/include cmake ../ -DCMAKE_INSTALL_PREFIX=/usr/local
 RUN make -j `nproc`
 RUN make install
 
@@ -83,12 +83,28 @@ WORKDIR /tmp/grib2
 RUN CC=gcc FC=gfortran LDFLAGS=-L/usr/local/lib CPPFLAGS=-I/usr/local/include make
 RUN cp ./wgrib2/wgrib2 /usr/local/bin
 
+### 3
+FROM builder as lapack-builder
+
+COPY --from=grib_api-builder /usr/local/ /usr/local/
+
+WORKDIR /tmp/
+
+RUN wget https://csdn-468674-transfer.s3.cn-north-1.jdcloud-oss.com/docker/ubuntu-meteorology-env/20.04/lapack-3.8.0.tar.gz
+
+RUN tar -xvf lapack-3.8.0.tar.gz
+
+WORKDIR /tmp/lapack-3.8.0
+RUN cp ./INSTALL/make.inc.gfortran ./make.inc
+RUN CC=gcc FC=gfortran LDFLAGS=-L/usr/local/lib CPPFLAGS=-I/usr/local/include make -j `nproc`
+RUN cp lib* /usr/local/lib/
+
 
 ### final
 FROM builder as ubuntu-meteorology-env
 MAINTAINER Tianjie Wu "wutj@cma.gov.cn" 
 
 COPY ./alias.sh /root/.bash_aliases
-COPY --from=grib_api-builder /usr/local/ /usr/local/
+COPY --from=lapack-builder /usr/local/ /usr/local/
 CMD ["/bin/bash"]
 
