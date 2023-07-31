@@ -11,7 +11,7 @@ alias ...='cd ../..'
 # use 'locale -a' to check
 export LC_ALL="C"
 
-PS1="[\e[30;45m\A\e[0m \e[30;42mubuntu-meteorology-env\e[0m:\e[33m\w\e[0m]\n$ "
+PS1="[\e[30;45m\A\e[0m \e[30;42mtianjie-ubuntu-meteorology-env\e[0m:\e[33m\w\e[0m]\n$ "
 
 export HISTTIMEFORMAT='%F %T '
 export HISTCONTROL=ignorespace
