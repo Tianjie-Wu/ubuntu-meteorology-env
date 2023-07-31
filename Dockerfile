@@ -1,3 +1,4 @@
+### /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/
 ### 0
 FROM docker.io/ubuntu:20.04 as builder
 
@@ -13,6 +14,19 @@ RUN apt-get update \
 FROM builder as hdf5-netcdf-builder
 WORKDIR /tmp/
 
+ENV LOCALIB=/usr/local
+ENV PATH=$LOCALIB/bin:$PATH
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LOCALIB/lib
+ENV LD_RUN_PATH=$LD_RUN_PATH:$LOCALIB/lib
+ENV LD_INCLUDE_PATH=$LD_INCLUDE_PATH:$LOCALIB/include
+ENV PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$LOCALIB/lib/pkgconfig
+
+# RUN wget https://support.hdfgroup.org/ftp/lib-external/szip/2.1.1/src/szip-2.1.1.tar.gz
+RUN wget https://csdn-468674-transfer.s3.cn-north-1.jdcloud-oss.com/docker/ubuntu-meteorology-env/20.04/szip-2.1.1.tar
+# RUN wget http://www.ijg.org/files/jpegsrc.v9e.tar.gz
+RUN wget https://csdn-468674-transfer.s3.cn-north-1.jdcloud-oss.com/docker/ubuntu-meteorology-env/20.04/jpegsrc.v9e.tar.gz
+# RUN wget https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.16/src/hdf-4.2.16.tar.bz2
+RUN wget https://csdn-468674-transfer.s3.cn-north-1.jdcloud-oss.com/docker/ubuntu-meteorology-env/20.04/hdf-4.2.16.tar.bz2
 # RUN wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.23/src/hdf5-1.8.23.tar.bz2 
 RUN wget https://csdn-468674-transfer.s3.cn-north-1.jdcloud-oss.com/docker/ubuntu-meteorology-env/20.04/hdf5-1.8.23.tar.bz2
 # RUN wget https://codeload.github.com/Unidata/netcdf-c/tar.gz/refs/tags/v4.8.1 -O netcdf-c-4.8.1.tar.gz
@@ -20,19 +34,40 @@ RUN wget https://csdn-468674-transfer.s3.cn-north-1.jdcloud-oss.com/docker/ubunt
 # RUN wget https://codeload.github.com/Unidata/netcdf-fortran/tar.gz/refs/tags/v4.5.3 -O netcdf-fortran-4.5.3.tar.gz
 RUN wget https://csdn-468674-transfer.s3.cn-north-1.jdcloud-oss.com/docker/ubuntu-meteorology-env/20.04/netcdf-fortran-4.5.3.tar.gz
 
+RUN tar -xvf szip-2.1.1.tar
+RUN tar -xvf jpegsrc.v9e.tar.gz
+RUN tar -xvf hdf-4.2.16.tar.bz2
 RUN tar -xvf hdf5-1.8.23.tar.bz2 
 RUN tar -xvf netcdf-c-4.8.1.tar.gz
 RUN tar -xvf netcdf-fortran-4.5.3.tar.gz
 
+WORKDIR /tmp/szip-2.1.1
+
+RUN ./configure --prefix=/usr/local --with-pic
+RUN make -j `nproc`
+RUN make install
+
+WORKDIR /tmp/jpeg-9e
+
+RUN ./configure --prefix=/usr/local 
+RUN make -j `nproc`
+RUN make install
+
+WORKDIR /tmp/hdf-4.2.16
+
+RUN ./configure --prefix=/usr/local --enable-fortran --disable-netcdf --with-pic
+RUN make -j `nproc`
+RUN make install
+
 WORKDIR /tmp/hdf5-1.8.23
 
-RUN ./configure --prefix=/usr/local --enable-fortran
+RUN ./configure --prefix=/usr/local --enable-fortran --enable-hdf4 --with-szlib=/usr/local
 RUN make -j `nproc`
 RUN make install
 
 WORKDIR /tmp/netcdf-c-4.8.1
 
-RUN CC=gcc FC=gfortran LDFLAGS=-L/usr/local/lib CPPFLAGS=-I/usr/local/include ./configure --prefix=/usr/local
+RUN CC=gcc FC=gfortran LDFLAGS=-L/usr/local/lib CPPFLAGS=-I/usr/local/include ./configure --prefix=/usr/local  --enable-hdf4
 RUN make -j `nproc`
 RUN make install
 
@@ -62,7 +97,7 @@ RUN tar -xvf wgrib2.tgz
 
 WORKDIR /tmp/jasper-1.900.1
 
-RUN CC=gcc FC=gfortran LDFLAGS=-L/usr/local/lib CPPFLAGS=-I/usr/local/include ./configure --prefix=/usr/local
+RUN CC=gcc FC=gfortran LDFLAGS=-L/usr/local/lib CPPFLAGS=-I/usr/local/include ./configure --prefix=/usr/local --with-pic 
 RUN make -j `nproc`
 RUN make install
 
